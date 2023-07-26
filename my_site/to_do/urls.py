@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from to_do.views import ShowTasks, TaskDetails, ShowCategory, AddTask, RegisterUser, login_user
+from .views import *
 
 urlpatterns = [
     path('', ShowTasks.as_view(), name='show_tasks'),
@@ -25,6 +25,7 @@ urlpatterns = [
     path('category/<slug:cat_slug>', ShowCategory.as_view(), name='show_category'),
     path('add_task/', AddTask.as_view(), name='add_task'),
     path('register/', RegisterUser.as_view(), name ='register_user'),
-    path('login/', login_user, name='login_user'),
+    path('login/', LoginUser.as_view(), name='login_user'),
+    path('logout/', logout_user, name='logout'),
 
 ]
