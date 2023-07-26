@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} {{task.category}} - {{task.title}} {% endblock %}
+
+
+{% block content %}
+<h1>{{task.title}}</h1>
+<p>Description - {{task.description}}</p>
+<p>Priority - {{task.get_priority_display}}</p>
+
+{% endblock %}
