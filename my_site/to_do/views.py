@@ -25,7 +25,7 @@ class ShowTasks(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return Task.objects.filter(status='P')
+        return Task.objects.filter(status='P').select_related('category')
 
 
 # def show_tasks(request):
@@ -61,12 +61,14 @@ class ShowCategory(DataMixin, ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(category__slug=self.kwargs['cat_slug'], status='P')
+        return Task.objects.filter(category__slug=self.kwargs['cat_slug'], status='P').select_related('category')
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(cat_selected=self.kwargs['cat_slug'],
-                                      title=f"Категория - {context['tasks'][0].category}"
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])
+        c_def = self.get_user_context(cat_selected=c.slug,
+                                      title=f"Категория - {c.name}"
                                       )
 
         return dict(list(context.items()) + list(c_def.items()))
