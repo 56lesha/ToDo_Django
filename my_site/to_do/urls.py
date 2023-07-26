@@ -16,14 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.views.decorators.cache import cache_page
 
 from .views import *
 
 urlpatterns = [
-    path('', cache_page(60)(ShowTasks.as_view()), name='show_tasks'),
+    path('', ShowTasks.as_view(), name='show_tasks'),
     path('task/<slug:task_slug>/', TaskDetails.as_view(), name='task_details'),
-    path('category/<slug:cat_slug>', cache_page(60)(ShowCategory.as_view()), name='show_category'),
+    path('category/<slug:cat_slug>', ShowCategory.as_view(), name='show_category'),
     path('add_task/', AddTask.as_view(), name='add_task'),
     path('register/', RegisterUser.as_view(), name ='register_user'),
     path('login/', LoginUser.as_view(), name='login_user'),
