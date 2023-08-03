@@ -5,14 +5,18 @@
 {% block content %}
 <div class="container mt-3">
   {% if user.is_authenticated %}
-    <h2>Tasks</h2>
+    <h2>{{ title }}</h2>
+    <p><a href="#">Update category</a></p>
+    <p><a href="#">Delete category</a></p>
+
     <table class="table table-striped">
       <thead>
         <tr>
           <th>Title</th>
           <th>Category</th>
           <th>Priority</th>
-          <th>Status</th>
+          <th>Update</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -20,8 +24,7 @@
         <tr>
           <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
           <td>{{task.category}}</td>
-          <td>{{task.priority}}</td>
-          <td>{{task.status}}</td>
+          <td>{{task.get_priority_display}}</td>
           <td><a href="{% url 'update_task' task_slug=task.slug %}">Update</a></td>
           <td><a href="{% url 'delete_task' id=task.id %}">Delete</a></td>
         </tr>
@@ -29,7 +32,7 @@
       </tbody>
     </table>
   {% else %}
-    <p><a href="#">Зарегистрируйтесь</a> или <a href="#">Войдите</a></p>
+    <p>To start using <a href="{% url 'register_user' %}">Register</a> or <a href="{% url 'login_user' %}">Login</a></p>
   {% endif %}
 </div>
 {% endblock %}

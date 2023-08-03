@@ -1,13 +1,13 @@
 from to_do.models import Category
 
-menu = [{'title': 'Home', 'url_name': 'show_tasks'},
+menu = [{'title': 'Tasks', 'url_name': 'show_tasks'},
         {'title': 'Add Task', 'url_name': 'add_task'},
         {'title': 'Add Category', 'url_name': 'add_category'},
         ]
 
 
 class DataMixin:
-    paginate_by = 2
+    paginate_by = 10
     def get_user_context(self, **kwargs):
         context = kwargs
         cur_user = self.request.user

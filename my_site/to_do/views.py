@@ -32,6 +32,7 @@ class ShowTasks(DataMixin, ListView):
         # это проверяется в django toolbar
 
 
+
 class TaskDetails(DataMixin, DetailView):
     model = Task
     context_object_name = "task"
@@ -72,7 +73,7 @@ class ShowCategory(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c = Category.objects.get(slug=self.kwargs['cat_slug'])
         c_def = self.get_user_context(cat_selected=c.slug,
-                                      title=f"Категория - {c.name}"
+                                      title=f"Category - {c.name}"
                                       )
         return dict(list(context.items()) + list(c_def.items()))
 
@@ -114,7 +115,7 @@ class RegisterUser(DataMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # сюда попадает форма регистрации переденная через form_class
-        c_def = self.get_user_context(title="Регистрация")  # сюда попадает общая часть для кода из utils
+        c_def = self.get_user_context(title="Registration")  # сюда попадает общая часть для кода из utils
         return dict(list(context.items()) + list(c_def.items()))  # соединяем в один словарь
 
     def form_valid(self, form):  # вызывается, если форма валидна

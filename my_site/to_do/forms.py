@@ -13,10 +13,10 @@ class AddTaskForm(forms.ModelForm):
 
 
 class RegisterUserForm(UserCreationForm, forms.ModelForm):
-    username = forms.CharField(label='Логин', widget=forms.TextInput)
+    username = forms.CharField(label='Login', widget=forms.TextInput)
     email = forms.EmailField(label='Email', widget=forms.EmailInput)
-    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
     captcha = CaptchaField()
 
     class Meta:
