@@ -4,27 +4,31 @@
 
 {% block content %}
 <div class="container mt-3">
-  <h2>Tasks</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Category</th>
-        <th>Priority</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for task in tasks %}
-      <tr>
-        <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
-        <td>{{task.category}}</td>
-        <td>{{task.priority}}</td>
-        <td>{{task.status}}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+  {% if user.is_authenticated %}
+    <h2>Tasks</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for task in tasks %}
+        <tr>
+          <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
+          <td>{{task.category}}</td>
+          <td>{{task.priority}}</td>
+          <td>{{task.status}}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p><a href="#">Зарегистрируйтесь</a> или <a href="#">Войдите</a></p>
+  {% endif %}
 </div>
 {% endblock %}
 

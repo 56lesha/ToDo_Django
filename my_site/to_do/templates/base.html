@@ -34,8 +34,11 @@
   </ul>
   {% endif %}
 </div>
-
+{% block content %}
+  {% endblock %}
+{% if user.is_authenticated %}
 <div>
+
   <ul>
     {% if cat_selected %}
       <li><a href="{% url 'show_tasks' %}">All</a></li>
@@ -50,11 +53,11 @@
     {% endif %}
   {% endfor %}
   </ul>
+
 </div>
 
 
-  {% block content %}
-  {% endblock %}
+
 
 
   <ul>
@@ -78,10 +81,7 @@
   {% endif %}
 
   </ul>
-
-
-
-
+{% endif %}
 
 
 </body>

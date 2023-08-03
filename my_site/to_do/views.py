@@ -25,7 +25,14 @@ class ShowTasks(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return Task.objects.filter(status='P').select_related('category')
+        cur_user = self.request.user
+        return Task.objects.filter(status='P', category__user=cur_user.id).select_related('category')
+        # select_related необходим для того, чтобы когда мы вытягиваем из бд данные,
+        # то мы сразу же и вытягиваем данные по связанному полю, чтобы постоянно не обращаться к БД.
+        # это проверяется в django toolbar
+
+
+
 
 
 # def show_tasks(request):
@@ -89,8 +96,8 @@ class ShowCategory(DataMixin, ListView):
 class AddTask(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddTaskForm
     template_name = 'to_do/add_task.html'
-    login_url = '/admin/'  # перенаправляет, если пользователь не авторизован
-    raise_exception = True  #
+    # login_url = '/admin/'  # перенаправляет, если пользователь не авторизован
+    raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -118,17 +125,14 @@ class RegisterUser(DataMixin, CreateView):
     success_url = '/login'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Регистрация")
-        return dict(list(context.items()) + list(c_def.items()))
+        context = super().get_context_data(**kwargs) # сюда попадает форма регистрации переденная через form_class
+        c_def = self.get_user_context(title="Регистрация") # сюда попадает общая часть для кода из utils
+        return dict(list(context.items()) + list(c_def.items())) # соединяем в один словарь
 
     def form_valid(self, form): #вызывается, если форма валидна
-        user = form.save()
-        login(self.request, user)
+        user = form.save() #сохраняем форму
+        login(self.request, user) #логиним
         return redirect('show_tasks')
-
-
-
 
 
 class LoginUser(DataMixin, LoginView):

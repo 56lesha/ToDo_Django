@@ -9,7 +9,8 @@ class DataMixin:
     paginate_by = 2
     def get_user_context(self, **kwargs):
         context = kwargs
-        context['categories'] = Category.objects.all()
+        cur_user = self.request.user
+        context['categories'] = Category.objects.filter(user=cur_user.id)
         user_menu = menu.copy()
         if not self.request.user.is_authenticated:
             user_menu.pop(1)

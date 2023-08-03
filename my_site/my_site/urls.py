@@ -21,7 +21,8 @@ from my_site import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('to_do.urls'))
+    path('captcha/', include('captcha.urls')),
+    path('', include('to_do.urls')),
 ]
 
 

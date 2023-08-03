@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from captcha.fields import CaptchaField
 
 from to_do.models import Task
 
@@ -11,11 +12,12 @@ class AddTaskForm(forms.ModelForm):
         fields = '__all__'
 
 
-class RegisterUserForm(UserCreationForm):
+class RegisterUserForm(UserCreationForm, forms.ModelForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput)
     email = forms.EmailField(label='Email', widget=forms.EmailInput)
     password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput)
+    captcha = CaptchaField()
 
     class Meta:
         model = User
