@@ -23,6 +23,7 @@ urlpatterns = [
     path('', ShowTasks.as_view(), name='show_tasks'),
     path('task/<slug:task_slug>/', TaskDetails.as_view(), name='task_details'),
     path('category/<slug:cat_slug>', ShowCategory.as_view(), name='show_category'),
+    path('add_category/', AddCategory.as_view(), name='add_category'),
     path('add_task/', AddTask.as_view(), name='add_task'),
     path('delete_task/<int:id>', delete_task, name='delete_task'),
     path('update_task/<slug:task_slug>', UpdateTask.as_view(), name='update_task'),

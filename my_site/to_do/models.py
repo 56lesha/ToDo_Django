@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+
 from django.urls import reverse
 
 
@@ -14,6 +15,7 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('show_category', kwargs={'cat_slug':self.slug},)
+
 
 
 

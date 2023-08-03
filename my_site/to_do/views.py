@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
-from to_do.forms import AddTaskForm, RegisterUserForm
+from to_do.forms import AddTaskForm, RegisterUserForm, AddCategoryForm
 from to_do.models import Task, Category
 from to_do.utils import DataMixin
 
@@ -44,10 +44,20 @@ class TaskDetails(DataMixin, DetailView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-# def task_details(request, task_slug):
-#     task = Task.objects.get(slug=task_slug)
-#     context = {'task': task, }
-#     return render(request, 'to_do/task_details.html', context=context)
+
+class AddCategory(DataMixin, LoginRequiredMixin, CreateView):
+    form_class = AddCategoryForm
+    template_name = 'to_do/add_category.html'
+    success_url = '/'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Add category')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class ShowCategory(DataMixin, ListView):
@@ -64,7 +74,6 @@ class ShowCategory(DataMixin, ListView):
         c_def = self.get_user_context(cat_selected=c.slug,
                                       title=f"Категория - {c.name}"
                                       )
-
         return dict(list(context.items()) + list(c_def.items()))
 
 
