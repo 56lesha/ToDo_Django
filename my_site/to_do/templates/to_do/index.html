@@ -22,6 +22,8 @@
           <td>{{task.category}}</td>
           <td>{{task.priority}}</td>
           <td>{{task.status}}</td>
+          <td><a href="{% url 'update_task' task_slug=task.slug %}">Update</a></td>
+          <td><a href="{% url 'delete_task' id=task.id %}">Delete</a></td>
         </tr>
       {% endfor %}
       </tbody>

@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from to_do.forms import AddTaskForm, RegisterUserForm
 from to_do.models import Task, Category
@@ -30,18 +30,6 @@ class ShowTasks(DataMixin, ListView):
         # select_related необходим для того, чтобы когда мы вытягиваем из бд данные,
         # то мы сразу же и вытягиваем данные по связанному полю, чтобы постоянно не обращаться к БД.
         # это проверяется в django toolbar
-
-
-
-
-
-# def show_tasks(request):
-#     tasks = Task.objects.all()
-#     categories = Category.objects.all()
-#     context = {'tasks': tasks,
-#                'title': 'Tasks',
-#                'categories':categories}
-#     return render(request, 'to_do/index.html', context=context)
 
 
 class TaskDetails(DataMixin, DetailView):
@@ -70,7 +58,6 @@ class ShowCategory(DataMixin, ListView):
     def get_queryset(self):
         return Task.objects.filter(category__slug=self.kwargs['cat_slug'], status='P').select_related('category')
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c = Category.objects.get(slug=self.kwargs['cat_slug'])
@@ -81,22 +68,10 @@ class ShowCategory(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-# def show_category(request, cat_slug=None):
-#     tasks = Task.objects.filter(category__slug=cat_slug)
-#     categories = Category.objects.all()
-#
-#     context = {'tasks': tasks,
-#                'categories': categories,
-#                'cat_selected': cat_slug
-#                }
-#
-#     return render(request, 'to_do/index.html', context=context)
-
-
 class AddTask(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddTaskForm
     template_name = 'to_do/add_task.html'
-    # login_url = '/admin/'  # перенаправляет, если пользователь не авторизован
+    success_url = '/'
     raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -105,18 +80,22 @@ class AddTask(LoginRequiredMixin, DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-# def add_task(request):
-#     if request.method == 'POST':
-#         form = AddTaskForm(request.POST)
-#         if form.is_valid():
-#             print(form.cleaned_data)
-#             form.save()
-#             return redirect('show_tasks')
-#
-#     else:
-#         form = AddTaskForm()
-#     return render(request, 'to_do/add_task.html', {'form': form,
-#                                                   'title': 'Add Task'})
+class UpdateTask(DataMixin, UpdateView):
+    model = Task
+    fields = ['title', 'description', 'priority', 'status']
+    template_name = 'to_do/update_task.html'
+    slug_url_kwarg = 'task_slug'
+    success_url = '/'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Update task')
+        return dict(list(context.items()) + list(c_def.items()))
+
+
+def delete_task(request, id):
+    Task.objects.get(pk=id).delete()
+    return redirect('show_tasks')
 
 
 class RegisterUser(DataMixin, CreateView):
@@ -125,13 +104,13 @@ class RegisterUser(DataMixin, CreateView):
     success_url = '/login'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs) # сюда попадает форма регистрации переденная через form_class
-        c_def = self.get_user_context(title="Регистрация") # сюда попадает общая часть для кода из utils
-        return dict(list(context.items()) + list(c_def.items())) # соединяем в один словарь
+        context = super().get_context_data(**kwargs)  # сюда попадает форма регистрации переденная через form_class
+        c_def = self.get_user_context(title="Регистрация")  # сюда попадает общая часть для кода из utils
+        return dict(list(context.items()) + list(c_def.items()))  # соединяем в один словарь
 
-    def form_valid(self, form): #вызывается, если форма валидна
-        user = form.save() #сохраняем форму
-        login(self.request, user) #логиним
+    def form_valid(self, form):  # вызывается, если форма валидна
+        user = form.save()  # сохраняем форму
+        login(self.request, user)  # логиним
         return redirect('show_tasks')
 
 
@@ -145,15 +124,6 @@ class LoginUser(DataMixin, LoginView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-
 def logout_user(request):
     logout(request)
     return redirect('login_user')
-
-
-
-
-
-
-
-
