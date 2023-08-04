@@ -1,9 +1,7 @@
 from django.contrib.auth import logout, login
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -19,18 +17,17 @@ class ShowTasks(DataMixin, ListView):
     context_object_name = 'tasks'
     template_name = 'to_do/index.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs): #используется для отображения данных в шаблоне
+    def get_context_data(self, *, object_list=None, **kwargs):  # используется для отображения данных в шаблоне
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Tasks')
         return dict(list(context.items()) + list(c_def.items()))
 
-    def get_queryset(self): #переопределяем данные, которые сразу же вытягиваются из модели
+    def get_queryset(self):  # переопределяем данные, которые сразу же вытягиваются из модели
         cur_user = self.request.user
         return Task.objects.filter(status='P', category__user=cur_user.id).select_related('category')
         # select_related необходим для того, чтобы когда мы вытягиваем из бд данные,
         # то мы сразу же и вытягиваем данные по связанному полю, чтобы постоянно не обращаться к БД.
         # это проверяется в django toolbar
-
 
 
 class TaskDetails(DataMixin, DetailView):
@@ -44,6 +41,40 @@ class TaskDetails(DataMixin, DetailView):
         c_def = self.get_user_context()
         return dict(list(context.items()) + list(c_def.items()))
 
+
+class AddTask(LoginRequiredMixin, DataMixin, CreateView):
+    form_class = AddTaskForm
+    template_name = 'to_do/add_task.html'
+    success_url = '/'
+    raise_exception = True
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Add task')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_form_kwargs(self):  # получение аргументов необходимымх для создания формы
+        kwargs = super().get_form_kwargs()  # вызываем родительский метод
+        kwargs['user'] = self.request.user  # добавляем в словарь
+        return kwargs  # теперь, когда пользователь передан, его можно использовать для создания логики
+
+
+class UpdateTask(DataMixin, UpdateView):
+    model = Task
+    fields = ['title', 'description', 'priority', 'status']
+    template_name = 'to_do/update_task.html'
+    slug_url_kwarg = 'task_slug'
+    success_url = '/'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Update task')
+        return dict(list(context.items()) + list(c_def.items()))
+
+
+def delete_task(id):
+    Task.objects.get(pk=id).delete()
+    return redirect('show_tasks')
 
 
 class AddCategory(DataMixin, LoginRequiredMixin, CreateView):
@@ -78,37 +109,6 @@ class ShowCategory(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class AddTask(LoginRequiredMixin, DataMixin, CreateView):
-    form_class = AddTaskForm
-    template_name = 'to_do/add_task.html'
-    success_url = '/'
-    raise_exception = True
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Add task')
-        return dict(list(context.items()) + list(c_def.items()))
-
-
-
-
-
-class UpdateTask(DataMixin, UpdateView):
-    model = Task
-    fields = ['title', 'description', 'priority', 'status']
-    template_name = 'to_do/update_task.html'
-    slug_url_kwarg = 'task_slug'
-    success_url = '/'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Update task')
-        return dict(list(context.items()) + list(c_def.items()))
-
-
-
-
-
 class UpdateCategory(DataMixin, UpdateView):
     model = Category
     fields = ['name', 'slug']
@@ -122,21 +122,10 @@ class UpdateCategory(DataMixin, UpdateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-def delete_task(request, id):
-    Task.objects.get(pk=id).delete()
-    return redirect('show_tasks')
-
-
-
 class DeleteCategory(DeleteView):
     model = Category
     success_url = reverse_lazy('show_tasks')
     slug_url_kwarg = 'cat_slug'
-
-
-# def delete_category(request, slug):
-#     Category.objects.get(slug=slug).delete()
-#     return redirect('show_tasks')
 
 
 class RegisterUser(DataMixin, CreateView):

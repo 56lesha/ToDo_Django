@@ -9,15 +9,19 @@ from to_do.models import Task, Category
 
 
 class AddTaskForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(user=user)
 
     class Meta:
         model = Task
         fields = ['title', 'description', 'priority', 'status', 'category']
 
     def save(self, commit=True):
-        instance = super().save(commit=False) # вызывает родительский метод без сохранения его в БД
+        instance = super().save(commit=False)  # вызывает родительский метод без сохранения его в БД
         if not instance.slug:
-            instance.slug = slugify(instance.title) #делаем слаг, преобразованием name в слаг
+            instance.slug = slugify(instance.title)  # делаем слаг, преобразованием name в слаг
         instance.save()
         return instance
 
