@@ -6,8 +6,10 @@
 <div class="container mt-3">
   {% if user.is_authenticated %}
     <h2>{{ title }}</h2>
-    <p><a href="#">Update category</a></p>
-    <p><a href="#">Delete category</a></p>
+    {% if cat_selected %}
+      <p><a href="{% url 'update_category' cat_slug=cat_selected %}">Update category</a></p>
+      <p><a href="{% url 'delete_category' cat_slug=cat_selected %}">Delete category</a></p>
+    {% endif %}
 
     <table class="table table-striped">
       <thead>

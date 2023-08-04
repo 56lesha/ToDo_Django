@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from to_do.forms import AddTaskForm, RegisterUserForm, AddCategoryForm
 from to_do.models import Task, Category
@@ -19,12 +19,12 @@ class ShowTasks(DataMixin, ListView):
     context_object_name = 'tasks'
     template_name = 'to_do/index.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs): #используется для отображения данных в шаблоне
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Tasks')
         return dict(list(context.items()) + list(c_def.items()))
 
-    def get_queryset(self):
+    def get_queryset(self): #переопределяем данные, которые сразу же вытягиваются из модели
         cur_user = self.request.user
         return Task.objects.filter(status='P', category__user=cur_user.id).select_related('category')
         # select_related необходим для того, чтобы когда мы вытягиваем из бд данные,
@@ -90,6 +90,9 @@ class AddTask(LoginRequiredMixin, DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
+
+
+
 class UpdateTask(DataMixin, UpdateView):
     model = Task
     fields = ['title', 'description', 'priority', 'status']
@@ -103,9 +106,37 @@ class UpdateTask(DataMixin, UpdateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
+
+
+
+class UpdateCategory(DataMixin, UpdateView):
+    model = Category
+    fields = ['name', 'slug']
+    template_name = 'to_do/update_category.html'
+    slug_url_kwarg = 'cat_slug'
+    success_url = '/'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Update category')
+        return dict(list(context.items()) + list(c_def.items()))
+
+
 def delete_task(request, id):
     Task.objects.get(pk=id).delete()
     return redirect('show_tasks')
+
+
+
+class DeleteCategory(DeleteView):
+    model = Category
+    success_url = reverse_lazy('show_tasks')
+    slug_url_kwarg = 'cat_slug'
+
+
+# def delete_category(request, slug):
+#     Category.objects.get(slug=slug).delete()
+#     return redirect('show_tasks')
 
 
 class RegisterUser(DataMixin, CreateView):
