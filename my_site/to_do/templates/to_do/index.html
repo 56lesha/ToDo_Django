@@ -11,7 +11,7 @@
       <p><a href="{% url 'delete_category' cat_slug=cat_selected %}">Delete category</a></p>
     {% endif %}
 
-    <table class="table table-striped">
+    <table class="table">
       <thead>
         <tr>
           <th>Title</th>
@@ -23,13 +23,34 @@
       </thead>
       <tbody>
       {% for task in tasks %}
-        <tr>
+      {% if task.priority == 'L' %}
+        <tr class="table-info">
           <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
           <td>{{task.category}}</td>
           <td>{{task.get_priority_display}}</td>
           <td><a href="{% url 'update_task' task_slug=task.slug %}">Update</a></td>
           <td><a href="{% url 'delete_task' id=task.id %}">Delete</a></td>
         </tr>
+
+      {% elif task.priority == 'M' %}
+        <tr class="table-warning">
+          <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
+          <td>{{task.category}}</td>
+          <td>{{task.get_priority_display}}</td>
+          <td><a href="{% url 'update_task' task_slug=task.slug %}">Update</a></td>
+          <td><a href="{% url 'delete_task' id=task.id %}">Delete</a></td>
+        </tr>
+
+      {% elif task.priority == 'H' %}
+        <tr class="table-danger">
+          <td><a href="{{ task.get_absolute_url }}">{{task.title}}</a></td>
+          <td>{{task.category}}</td>
+          <td>{{task.get_priority_display}}</td>
+          <td><a href="{% url 'update_task' task_slug=task.slug %}">Update</a></td>
+          <td><a href="{% url 'delete_task' id=task.id %}">Delete</a></td>
+        </tr>
+
+      {% endif %}
       {% endfor %}
       </tbody>
     </table>
