@@ -7,6 +7,7 @@ class TestToDo(TestCase):
 
     def test_index(self):
         response = self.client.get('')
+        print(f" test task data - {response.context['tasks']}")
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, template_name='to_do/index.html')
 
